@@ -1,0 +1,245 @@
+CREATE TABLE `brand` (
+    `brand_id` int(11) NOT NULL  AUTO_INCREMENT,
+    `brand_name` varchar(255) NOT NULL,
+    `logo` varchar(255) NOT NULL,
+    PRIMARY KEY (`brand_id`),
+    UNIQUE KEY `UK_hsu7w3m7wxvplg49ip7g0v5rr` (`brand_name`)
+  );
+
+  CREATE TABLE `personal_info` (
+    `person_id` int(11) NOT NULL AUTO_INCREMENT,
+    `gender` varchar(255) NOT NULL,
+    `address` varchar(255) NOT NULL,
+    `adharno` varchar(255) DEFAULT NULL,
+    `dob` datetime(6) NOT NULL,
+    `email` varchar(255) NOT NULL,
+    `firstname` varchar(255) NOT NULL,
+    `lastname` varchar(255) NOT NULL,
+    `phoneno` varchar(255) NOT NULL,
+    `zipcode` varchar(255) NOT NULL,
+    PRIMARY KEY (`person_id`),
+    UNIQUE KEY `UK_35foplfi87fvn18trg9hl5upp` (`email`),
+    UNIQUE KEY `UK_eqh5olr0xpeuankm175xtfacf` (`phoneno`)
+  );
+  CREATE TABLE `user` (
+    `username` varchar(255) NOT NULL,
+    `active` int(11) NOT NULL,
+    `password` varchar(255) DEFAULT NULL,
+    `recovery_code` varchar(11) NOT NULL,
+    `type` varchar(255) DEFAULT NULL,
+    PRIMARY KEY (`username`)
+  );
+  CREATE TABLE `item` (
+    `item_id` int(11) NOT NULL AUTO_INCREMENT,
+    `brand_id` int(11) NOT NULL,
+    `category` varchar(255) DEFAULT NULL,
+    `cost_price` int(11) NOT NULL,
+    `discount` int(11) NOT NULL,
+    `imgurl` varchar(255) DEFAULT NULL,
+    `mrp` int(11) NOT NULL,
+    `name` varchar(255) DEFAULT NULL,
+    `qt_avail` int(11) NOT NULL,
+    `rating` int(11) NOT NULL,
+    `sold_qt` int(11) NOT NULL,
+    `voucher_credit` int(11) NOT NULL,
+    PRIMARY KEY (`item_id`),
+    KEY `brand_id` (`brand_id`),
+    CONSTRAINT `item_ibfk_1` FOREIGN KEY (`brand_id`) REFERENCES `brand` (`brand_id`) ON DELETE CASCADE
+  );
+  CREATE TABLE `supplier` (
+    `supplier_id` int(11) NOT NULL AUTO_INCREMENT,
+    `person_id` int(11) NOT NULL,
+    PRIMARY KEY (`supplier_id`),
+    KEY `person_id` (`person_id`),
+    CONSTRAINT `supplier_ibfk_1` FOREIGN KEY (`person_id`) REFERENCES `personal_info` (`person_id`) ON DELETE CASCADE
+  );
+
+
+
+  CREATE TABLE `customer` (
+    `customer_id` int(11) NOT NULL AUTO_INCREMENT,
+    `person_id` int(11) NOT NULL,
+    `username` varchar(255) DEFAULT NULL,
+    PRIMARY KEY (`customer_id`),
+    KEY `username` (`username`),
+    KEY `person_id` (`person_id`),
+    CONSTRAINT `customer_ibfk_1` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE CASCADE,
+    CONSTRAINT `customer_ibfk_2` FOREIGN KEY (`person_id`) REFERENCES `personal_info` (`person_id`) ON DELETE CASCADE
+  );
+  
+  CREATE TABLE `emi` (
+    `emi_id` int(11) NOT NULL AUTO_INCREMENT,
+    `intrest` double NOT NULL,
+     principal int  Not null,
+     date  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `customer_id` int(11) NOT NULL,
+    `item_id` int(11) DEFAULT NULL,
+    `paid_fraction` int(11) NOT NULL,
+    `pending` int(11) NOT NULL,
+    `tot_fraction` int(11) NOT NULL,
+    PRIMARY KEY (`emi_id`),
+    KEY `customer_id` (`customer_id`),
+    KEY `item_id` (`item_id`),
+    CONSTRAINT `emi_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`) ON DELETE CASCADE,
+    CONSTRAINT `emi_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`) ON DELETE SET NULL
+  );
+  CREATE TABLE `employee` (
+    `employee_id` int(11) NOT NULL AUTO_INCREMENT,
+    `balance` int(11) NOT NULL,
+    `person_id` int(11) NOT NULL,
+    `salary` int(11) NOT NULL,
+    `username` varchar(255) DEFAULT NULL,
+    PRIMARY KEY (`employee_id`),
+    KEY `person_id` (`person_id`),
+    KEY `username` (`username`),
+    CONSTRAINT `employee_ibfk_1` FOREIGN KEY (`person_id`) REFERENCES `personal_info` (`person_id`) ON DELETE CASCADE,
+    CONSTRAINT `employee_ibfk_4` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE CASCADE
+  );
+  CREATE TABLE `expenses` (
+    `expenses_id` int(11) NOT NULL AUTO_INCREMENT,
+    `amount` int(11) NOT NULL,
+    `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `description` varchar(255) DEFAULT NULL,
+    `type` varchar(255) NOT NULL,
+    PRIMARY KEY (`expenses_id`)
+  );
+
+  CREATE TABLE `feedback` (
+    `feedback_id` int(11) NOT NULL AUTO_INCREMENT,
+    `customer_id` int(11) NOT NULL,
+    `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `description` varchar(255) NOT NULL,
+    `item_id` int(11) NOT NULL,
+    `rating` int(11) NOT NULL,
+    PRIMARY KEY (`feedback_id`),
+    KEY `customer_id` (`customer_id`),
+    KEY `item_id` (`item_id`),
+    CONSTRAINT `feedback_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`) ON DELETE CASCADE,
+    CONSTRAINT `feedback_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`) ON DELETE CASCADE
+  );
+  CREATE TABLE `income_tax` (
+    `income_tax_id` int(11) NOT NULL AUTO_INCREMENT,
+    `amount` int(11) NOT NULL,
+    `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `penality` int(11) NOT NULL,
+    PRIMARY KEY (`income_tax_id`)
+  );
+  CREATE TABLE `invoice` (
+    `invoice_id` int(11) NOT NULL AUTO_INCREMENT,
+    `amount` int(11) DEFAULT NULL,
+    `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `supplierid` int(11) NOT NULL,
+    PRIMARY KEY (`invoice_id`),
+    KEY `supplierid` (`supplierid`),
+    CONSTRAINT `invoice_ibfk_1` FOREIGN KEY (`supplierid`) REFERENCES `supplier` (`supplier_id`) ON DELETE CASCADE
+  );
+
+
+  CREATE TABLE `reciept` (
+    `receipt_id` int(11) NOT NULL AUTO_INCREMENT,
+    `amount` int(11) NOT NULL,
+    `amount_payed` int(11) NOT NULL,
+    `customer_id` int(11) NOT NULL,
+    `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `discount` int(11) NOT NULL,
+    PRIMARY KEY (`receipt_id`),
+    KEY `customer_id` (`customer_id`),
+    CONSTRAINT `reciept_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`) ON DELETE CASCADE
+  );
+
+  CREATE TABLE `voucher` (
+    `voucher_id` int(11) NOT NULL AUTO_INCREMENT,
+    `credits` int(11) NOT NULL,
+    `customerid` int(11) NOT NULL,
+    PRIMARY KEY (`voucher_id`),
+    KEY `customerid` (`customerid`),
+    CONSTRAINT `voucher_ibfk_1` FOREIGN KEY (`customerid`) REFERENCES `customer` (`customer_id`) ON DELETE CASCADE
+  );
+  CREATE TABLE `wages` (
+    `wage_id` int(11) NOT NULL AUTO_INCREMENT,
+    `amount` int(11) NOT NULL,
+    `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `employee_id` int(11) NOT NULL,
+    PRIMARY KEY (`wage_id`),
+    KEY `employee_id` (`employee_id`),
+    CONSTRAINT `wages_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`) ON DELETE CASCADE
+  );
+
+  Create table cart(
+    item_id int,
+    quantity int,
+    customer_id int
+  );
+
+
+
+// create trigger test before delete on customer 
+// for each row begin 
+// declare name varchar(255);
+// declare cid int;
+// set name=old.username;
+// set cid=old.customer_id;
+// delete from user where username=name;
+// delete from cart where customer_id=cid;
+//  end;$$
+
+
+
+create trigger test2 before insert on ritem
+for each row 
+begin 
+declare id int;
+declare qt int;
+set id=new.item_id;
+set qt=new.quantity;
+update  item set qt_avail=qt_avail-qt ,sold_qt=sold_qt+qt where item_id=id; 
+ end;
+ $$
+
+
+ declare qt int;
+ create trigger test3 before insert on feedback
+ for each row 
+ begin 
+ declare id int;
+ declare rt int;
+ declare rrid int;
+ set rrid=new.rid;
+set id=new.item_id;
+set rt=new.rating;
+
+set qt= (select quantity from ritem where rrid=rid and item_id=id);
+update  item set rating=(rating*sold_qt+rt*qt)/(qt+sold_qt) where item_id=id; 
+  end;
+  $$
+
+
+
+
+  create trigger test5 before insert on iitem
+  for each row 
+  begin 
+  declare id int;
+  declare qt int;
+  set id=new.item_id;
+  set qt=new.quantity;
+  update  item set qt_avail=qt_avail+qt  where item_id=id; 
+   end;
+   $$
+  
+  
+// create trigger test4 after delete on employee 
+// for each row begin 
+// declare name varchar(255);
+// declare id int;
+// set id=old.employee_id;
+// set name=(select username from employee where employee_id=id);
+// delete from user where username=name;
+//  end;$$
+  
+  //for date
+  // Personal_info p=new Personal_info();
+  // Date date = new GregorianCalendar(2014, Calendar.FEBRUARY, 11).getTime();
+
+  // // date 9plugin
+  // https://github.com/fengyuanchen/datepicker/blob/master/README.md
